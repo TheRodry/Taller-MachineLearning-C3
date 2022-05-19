@@ -172,25 +172,52 @@ print(f'f1: {f1_scoreSVC}')
 
 # ARBOL DE DECISIÓN
 
-# Seleccionar un modelo
-arbol = DecisionTreeClassifier()
+# ARBOL DE DECISIÓN
+kfold = KFold(n_splits=5)
 
-# Entreno el modelo
-arbol.fit(x_train, y_train)
+acc_scores_train_train = []
+acc_scores_test_train = []
+arbol = DecisionTreeClassifier()
+for train, test in kfold.split(x, y):
+    arbol.fit(x[train], y[train])
+    scores_train_train = arbol.score(x[train], y[train])
+    scores_test_train = arbol.score(x[test], y[test])
+    acc_scores_train_train.append(scores_train_train)
+    acc_scores_test_train.append(scores_test_train)
+    
+y_pred = arbol.predict(x_test_out)
+# Seleccionar un modelo
 
 # MÉTRICAS
 
 print('*'*50)
-print('Decisión Tree')
+print('ARBOL DE DECISIÓN')
 
 # Accuracy de Entrenamiento de Entrenamiento
-print(f'accuracy de Entrenamiento de Entrenamiento: {arbol.score(x_train, y_train)}')
+print(f'accuracy de Entrenamiento de Entrenamiento: {np.array(acc_scores_train_train).mean()}')
 
 # Accuracy de Test de Entrenamiento
-print(f'accuracy de Test de Entrenamiento: {arbol.score(x_test, y_test)}')
+print(f'accuracy de Test de Entrenamiento: {np.array(acc_scores_test_train).mean()}')
 
 # Accuracy de Validación
-print(f'accuracy de Validación: {arbol.score(x_test_out, y_test_out)}')
+print(f'accuracy de Validación: {logreg.score(x_test_out, y_test_out)}')
+
+# Matriz de confusión
+print(f'Matriz de confusión: {confusion_matrix(y_test_out, y_pred)}')
+
+matriz_confusion = confusion_matrix(y_test_out, y_pred)
+plt.figure(figsize = (6, 6))
+sns.heatmap(matriz_confusion)
+plt.title("Mariz de confución")
+
+precision = precision_score(y_test_out, y_pred, average=None).mean()
+print(f'Precisión: {precision}')
+
+recall = recall_score(y_test_out, y_pred, average=None).mean()
+print(f'Re-call: {recall}')
+
+f1_scoreAD= f1_score(y_test_out, y_pred, average=None).mean()
+print(f'f: {f1_scoreAD}')
 # RANDOM FOREST
 kfold = KFold(n_splits=5)
 
