@@ -205,7 +205,7 @@ y_pred = arbol.predict(x_test_out)
 # MÉTRICAS
 
 print('*'*50)
-print('Maquina de soporte vectorial')
+print('ARBOL DE DECISIÓN')
 
 # Accuracy de Entrenamiento de Entrenamiento
 print(f'accuracy de Entrenamiento de Entrenamiento: {np.array(acc_scores_train_train).mean()}')
@@ -234,11 +234,24 @@ f1_score3= f1_score(y_test_out, y_pred, average=None).mean()
 print(f'f: {f1_score3}')
 
 # RANDOM FOREST
+kfold = KFold(n_splits=5)
 
+acc_scores_train_train = []
+acc_scores_test_train = []
 ranforest = RandomForestClassifier()
+for train, test in kfold.split(x, y):
+    ranforest.fit(x[train], y[train])
+    scores_train_train = ranforest.score(x[train], y[train])
+    scores_test_train = ranforest.score(x[test], y[test])
+    acc_scores_train_train.append(scores_train_train)
+    acc_scores_test_train.append(scores_test_train)
+    
+y_pred = ranforest.predict(x_test_out)
+
+
 
 # Entrenar el modelo
-ranforest.fit(x_train, y_train)
+#ranforest.fit(x_train, y_train)
 
 # Metricas
 
@@ -247,10 +260,27 @@ print('Random Forest')
 
 
 # Accuracy de Entrenamiento de Entrenamiento
-print(f'accuracy de Entrenamiento de Entrenamiento: {ranforest.score(x_train, y_train)}')
+print(f'accuracy de Entrenamiento de Entrenamiento: {np.array(acc_scores_train_train).mean()}')
 
 # Accuracy de Test de Entrenamiento
-print(f'accuracy de Test de Entrenamiento: {ranforest.score(x_test, y_test)}')
+print(f'accuracy de Test de Entrenamiento: {np.array(acc_scores_test_train).mean()}')
 
 # Accuracy de Validación
-print(f'accuracy de Validación: {ranforest.score(x_test_out, y_test_out)}')
+print(f'accuracy de Validación: {logreg.score(x_test_out, y_test_out)}')
+
+# Matriz de confusión
+print(f'Matriz de confusión: {confusion_matrix(y_test_out, y_pred)}')
+
+matriz_confusion = confusion_matrix(y_test_out, y_pred)
+plt.figure(figsize = (6, 6))
+sns.heatmap(matriz_confusion)
+plt.title("Mariz de confución")
+
+precision = precision_score(y_test_out, y_pred, average=None).mean()
+print(f'Precisión: {precision}')
+
+recall = recall_score(y_test_out, y_pred, average=None).mean()
+print(f'Re-call: {recall}')
+
+f1_score4= f1_score(y_test_out, y_pred, average=None).mean()
+print(f'f: {f1_score4}')
