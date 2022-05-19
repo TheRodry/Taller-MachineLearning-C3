@@ -187,7 +187,7 @@ kfold = KFold(n_splits=5)
 
 acc_scores_train_train = []
 acc_scores_test_train = []
-arbol = DecisionTreeClassifier(gamma='auto',max_iter = 7600)
+arbol = DecisionTreeClassifier()
 for train, test in kfold.split(x, y):
     arbol.fit(x[train], y[train])
     scores_train_train = arbol.score(x[train], y[train])
